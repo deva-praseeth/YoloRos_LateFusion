@@ -31,71 +31,46 @@ $ docker build -t yolo_ros .
 
 Run the docker container. If you want to use CUDA, you have to install the [NVIDIA Container Tollkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and add `--gpus all`.
 
+Each container will be responsible to publish image from 1 camera, hence if there is 5 cameras, 5 containers would need to be created with the following with different names.
+
 ```shell
-$ docker run -it --rm --gpus all yolo_ros
+sudo docker run -it \
+  --gpus all \
+  --cap-add=ALL \
+  --device=/dev/bus/usb:/dev/bus/usb \
+  --device=/dev/nvhost* \
+  --network=host \
+  -e ROS_DOMAIN_ID=0 \
+  -v /home:/host_home \
+  -v /etc:/host_etc \
+  -v /var:/host_var \
+  -w /root \
+  --name <name> \
+  yolo_ros
+
+```
+
+Verify that container is created
+```shell
+sudo docker ps -a
 ```
 
 ## Models
 
 The compatible models for yolo_ros are the following:
 
-- [YOLOv3](https://docs.ultralytics.com/models/yolov3/)
-- [YOLOv4](https://docs.ultralytics.com/models/yolov4/)
-- [YOLOv5](https://docs.ultralytics.com/models/yolov5/)
-- [YOLOv6](https://docs.ultralytics.com/models/yolov6/)
-- [YOLOv7](https://docs.ultralytics.com/models/yolov7/)
 - [YOLOv8](https://docs.ultralytics.com/models/yolov8/)
-- [YOLOv9](https://docs.ultralytics.com/models/yolov9/)
-- [YOLOv10](https://docs.ultralytics.com/models/yolov10/)
-- [YOLOv11](https://docs.ultralytics.com/models/yolo11/)
-- [YOLO-NAS](https://docs.ultralytics.com/models/yolo-nas/)
-- [YOLO-World](https://docs.ultralytics.com/models/yolo-world/)
+
 
 ## Usage
 
 <details>
 <summary>Click to expand</summary>
 
-### YOLOv5
-
-```shell
-$ ros2 launch yolo_bringup yolov5.launch.py
-```
-
 ### YOLOv8
 
 ```shell
 $ ros2 launch yolo_bringup yolov8.launch.py
-```
-
-### YOLOv9
-
-```shell
-$ ros2 launch yolo_bringup yolov9.launch.py
-```
-
-### YOLOv10
-
-```shell
-$ ros2 launch yolo_bringup yolov10.launch.py
-```
-
-### YOLOv11
-
-```shell
-$ ros2 launch yolo_bringup yolov11.launch.py
-```
-
-### YOLO-NAS
-
-```shell
-$ ros2 launch yolo_bringup yolo-nas.launch.py
-```
-
-### YOLO-World
-
-```shell
-$ ros2 launch yolo_bringup yolo-world.launch.py
 ```
 
 </details>
