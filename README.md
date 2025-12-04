@@ -13,12 +13,14 @@ ROS 2 wrap for YOLO models from [Ultralytics](https://github.com/ultralytics/ult
 ## Installation
 
 ```shell
-$ cd ~/ros2_ws/src
-$ git clone https://github.com/mgonzs13/yolo_ros.git
-$ pip3 install -r yolo_ros/requirements.txt
-$ cd ~/ros2_ws
-$ rosdep install --from-paths src --ignore-src -r -y
-$ colcon build
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/deva-praseeth/YoloRos_LateFusion.git
+# if Ubuntu ver.>=24.04, perform below commands in venv (recommended), or use --break-system-packages 
+pip3 install -r yolo_ros/requirements.txt
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -r -y
+colcon build
 ```
 
 ## Docker
@@ -26,7 +28,8 @@ $ colcon build
 Build the yolo_ros docker.
 
 ```shell
-$ docker build -t yolo_ros .
+cd ~/ros2_ws/src/yolo_ros
+docker build -t yolo_ros .
 ```
 
 Run the docker container. If you want to use CUDA, you have to install the [NVIDIA Container Tollkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and add `--gpus all`.
@@ -78,7 +81,7 @@ The compatible models for yolo_ros are the following:
 ### YOLOv8
 
 ```shell
-$ ros2 launch yolo_bringup yolov8.launch.py
+ros2 launch yolo_bringup yolov8.launch.py
 ```
 
 </details>
@@ -140,7 +143,7 @@ These are some resource comparisons using the default yolov8m.pt model on a 30fp
 ### YOLO 3D
 
 ```shell
-$ ros2 launch yolo_bringup yolov8.launch.py use_3d:=True
+ros2 launch yolo_bringup yolov8.launch.py use_3d:=True
 ```
 
 <p align="center">
@@ -154,7 +157,7 @@ $ ros2 launch yolo_bringup yolov8.launch.py use_3d:=True
 This is the standard behavior of yolo_ros which includes object tracking.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py
+ros2 launch yolo_bringup yolo.launch.py
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1gTQt6soSIq1g2QmK7locHDiZ-8MqVl2w)](https://drive.google.com/file/d/1gTQt6soSIq1g2QmK7locHDiZ-8MqVl2w/view?usp=sharing)
@@ -164,7 +167,7 @@ $ ros2 launch yolo_bringup yolo.launch.py
 Instance masks are the borders of the detected objects, not all the pixels inside the masks.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt
+ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1dwArjDLSNkuOGIB0nSzZR6ABIOCJhAFq)](https://drive.google.com/file/d/1dwArjDLSNkuOGIB0nSzZR6ABIOCJhAFq/view?usp=sharing)
@@ -174,7 +177,7 @@ $ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt
 Online persons are detected along with their keypoints.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt
+ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1pRy9lLSXiFEVFpcbesMCzmTMEoUXGWgr)](https://drive.google.com/file/d/1pRy9lLSXiFEVFpcbesMCzmTMEoUXGWgr/view?usp=sharing)
@@ -184,7 +187,7 @@ $ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt
 The 3D bounding boxes are calculated by filtering the depth image data from an RGB-D camera using the 2D bounding box. Only objects with a 3D bounding box are visualized in the 2D image.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py use_3d:=True
+ros2 launch yolo_bringup yolo.launch.py use_3d:=True
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1ZcN_u9RB9_JKq37mdtpzXx3b44tlU-pr)](https://drive.google.com/file/d/1ZcN_u9RB9_JKq37mdtpzXx3b44tlU-pr/view?usp=sharing)
@@ -194,7 +197,7 @@ $ ros2 launch yolo_bringup yolo.launch.py use_3d:=True
 In this, the depth image data is filtered using the max and min values obtained from the instance masks. Only objects with a 3D bounding box are visualized in the 2D image.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt use_3d:=True
+ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt use_3d:=True
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1wVZgi5GLkAYxv3GmTxX5z-vB8RQdwqLP)](https://drive.google.com/file/d/1wVZgi5GLkAYxv3GmTxX5z-vB8RQdwqLP/view?usp=sharing)
@@ -204,7 +207,7 @@ $ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-seg.pt use_3d:=True
 Each keypoint is projected in the depth image and visualized using purple spheres. Only objects with a 3D bounding box are visualized in the 2D image.
 
 ```shell
-$ ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt use_3d:=True
+ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt use_3d:=True
 ```
 
 [![](https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=1j4VjCAsOCx_mtM2KFPOLkpJogM0t227r)](https://drive.google.com/file/d/1j4VjCAsOCx_mtM2KFPOLkpJogM0t227r/view?usp=sharing)
