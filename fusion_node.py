@@ -56,7 +56,7 @@ class YoloFusionNode(Node):
                  output_det_topic: str,
                  output_img_topic: str,
                  publish_rate_hz: float):
-        super().__init__('yolo_fusion_node_single')
+        super().__init__('late_fusion_node')
 
         self.get_logger().info('YOLO fusion node starting (freshness-safe).')
 
