@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-yolo_fusion_node.py (updated: 5 cameras, 2x3 image stitch)
+yolo_fusion_node.py (updated: supports 1..6 cameras, 2x3 image stitch)
 
 Behavior summary:
  - Detections (append-only): only accept detections that arrived *since the last publish*.
@@ -10,6 +10,7 @@ Behavior summary:
  - Preserves per-detection bbox3d.frame_id / keypoints3d.frame_id to record source camera.
  - Uses cv_bridge + OpenCV for image conversions. Stitching forms a 2x3 grid (left->right, top->bottom)
    and tile placement follows the order of img_input_topics.
+ - Accepts between 1 and 6 detection topics and 1 and 6 image topics. Missing grid cells are rendered black.
 """
 
 from __future__ import annotations
@@ -35,19 +36,21 @@ except Exception:
     CvBridge = None
     CvBridgeError = Exception  # fallback
 
-# Defaults updated to 5 topics
+# Defaults updated to support up to 6 topics (grid is 2x3)
 DEFAULT_DET_INPUTS = [
     '/yolo/detections1',
     '/yolo/detections2',
     '/yolo/detections3',
     '/yolo/detections4',
     '/yolo/detections5',
+    '/yolo/detections6',   # optional: uncomment or pass via CLI
 ]
 DEFAULT_IMG_INPUTS = [
     '/yolo/dbg_image3',
     '/yolo/dbg_image1',
     '/yolo/dbg_image2',
     '/yolo/dbg_image5',
+    '/yolo/dbg_image6',    # optional: uncomment or pass via CLI
     '/yolo/dbg_image4',
 ]
 DEFAULT_OUTPUT_DET = '/fused/detections'
@@ -69,7 +72,8 @@ class YoloFusionNode(Node):
                  publish_rate_hz: float):
         super().__init__('late_fusion_node')
 
-        self.get_logger().info('YOLO fusion node starting (freshness-safe, 5 cams, 2x3 stitch).')
+        cam_count = max(len(det_input_topics), len(img_input_topics))
+        self.get_logger().info(f'YOLO fusion node starting (freshness-safe, supports 1..{GRID_CELLS} cams). Using up to {cam_count} cameras.')
 
         self.det_input_topics = det_input_topics
         self.img_input_topics = img_input_topics
@@ -409,12 +413,12 @@ class YoloFusionNode(Node):
             self.get_logger().error(f'Failed to publish fused dbg image: {e}')
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description='YOLO fusion node with image stitching (5 cams, 2x3 grid)')
-    parser.add_argument('--det_inputs', nargs=5, metavar=('D1','D2','D3','D4','D5'),
-                        help='Five detection input topics.',
+    parser = argparse.ArgumentParser(description=f'YOLO fusion node with image stitching (1..{GRID_CELLS} cams, 2x3 grid)')
+    parser.add_argument('--det_inputs', nargs='*',
+                        help=f'Detection input topics (1..{GRID_CELLS}). If omitted, defaults are used.',
                         default=DEFAULT_DET_INPUTS)
-    parser.add_argument('--img_inputs', nargs=5, metavar=('I3','I1','I2','I5','I4'),
-                        help='Five debug image input topics (order defines tile positions left->right, top->bottom).',
+    parser.add_argument('--img_inputs', nargs='*',
+                        help=f'Debug image input topics (1..{GRID_CELLS}). Order defines tile positions left->right, top->bottom.',
                         default=DEFAULT_IMG_INPUTS)
     parser.add_argument('--output_det', default=DEFAULT_OUTPUT_DET,
                         help='Fused detection output topic (default: /fused/detections)')
@@ -429,8 +433,12 @@ def main(argv=None):
 
     det_inputs = args.det_inputs
     img_inputs = args.img_inputs
-    if len(det_inputs) != 5 or len(img_inputs) != 5:
-        print('ERROR: provide exactly 5 detection topics and 5 image topics', file=sys.stderr)
+    # normalize defaults that might include commented-out placeholders
+    det_inputs = [t for t in det_inputs if t is not None and t != '']
+    img_inputs = [t for t in img_inputs if t is not None and t != '']
+
+    if not (1 <= len(det_inputs) <= GRID_CELLS) or not (1 <= len(img_inputs) <= GRID_CELLS):
+        print(f'ERROR: provide between 1 and {GRID_CELLS} detection topics and image topics', file=sys.stderr)
         return 2
 
     rclpy.init()
