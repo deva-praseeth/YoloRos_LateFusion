@@ -1,5 +1,7 @@
-# YOLOv8 activation with Docker container
+# Late fusion of YOLOv8 Detections
+This repository contains the code base for the fusion of object detections using YOLOv8 detections from 5 different Lucid Vision GigE cameras. We run docker container with tmuxinator panes to perform YOLO detections on each camera individually and the fusion node, running in the host, performs late fusion of the detection topics. Moreover, fusion node performs a 2x3 stitch of the 5 camera detection images (possible 6th camera addition).
 
+## ROS2 Wrap for YOLO
 ROS 2 wrap for YOLO models from [Ultralytics](https://github.com/ultralytics/ultralytics) to perform object detection and tracking, instance segmentation, human pose estimation and Oriented Bounding Box (OBB). There are also 3D versions of object detection, including instance segmentation, and human pose estimation based on depth images.
 
 ## Table of Contents
@@ -94,7 +96,6 @@ ros2 launch yolo_bringup yolov8.launch.py
 
 - **/yolo/detections**: Objects detected by YOLO using the RGB images. Each object contains a bounding box and a class name. It may also include a mark or a list of keypoints.
 - **/yolo/tracking**: Objects detected and tracked from YOLO results. Each object is assigned a tracking ID.
-- **/yolo/detections_3d**: 3D objects detected. YOLO results are used to crop the depth images to create the 3D bounding boxes and 3D keypoints.
 - **/yolo/debug_image**: Debug images showing the detected and tracked objects. They can be visualized with rviz2.
 
 ### Parameters
