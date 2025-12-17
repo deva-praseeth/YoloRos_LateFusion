@@ -18,7 +18,7 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 git clone https://github.com/deva-praseeth/YoloRos_LateFusion.git
 # if Ubuntu ver.>=24.04, perform below commands in venv (recommended), or use --break-system-packages
-pip3 install -r yolo_ros/requirements.txt
+pip3 install -r YoloRos_LateFusion/requirements.txt
 cd ~/ros2_ws
 rosdep install --from-paths src --ignore-src -r -y
 colcon build
@@ -29,7 +29,7 @@ colcon build
 Build the yolo_ros docker.
 
 ```shell
-cd ~/ros2_ws/src/yolo_ros
+cd ~/ros2_ws/src/YoloRos_LateFusion
 docker build -t yolo_ros .
 ```
 
@@ -43,7 +43,7 @@ sudo docker run -it \
   --cap-add=ALL \
   --device=/dev/bus/usb:/dev/bus/usb \
   --network=host \
-  -e ROS_DOMAIN_ID=0 \
+  --hostname <host-name> \ #host username
   -v /home:/host_home \
   -v /etc:/host_etc \
   -v /var:/host_var \
